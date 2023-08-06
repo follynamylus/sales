@@ -4,6 +4,7 @@ import streamlit as st #<-----------------------Import Streamlit for building th
 import statsmodels.api as sm #<-----------------Import Stats model for making the statistical forecast
 import pandas as pd #<--------------------------Import Pandas for data preprocessing
 import plotly.express as px  #<-----------------Import  Plotly Express for data visualization
+import joblib
 
 #***************************************BUILDING THE INPUT WIDGETS, TABS AND SIDEBAR***************************************
 tab_2, tab_1,tab_3 = st.tabs(['DATAFRAME AND DOWNLOAD','VIEW PREDICTION','ABOUT APPLICATION'])#<--- Creation of three tabs
@@ -43,7 +44,7 @@ def load_model(file_name) : # <---------- Define the function.
     '''
     return sm.iolib.smpickle.load_pickle(file_name) # <------------- Function return
 
-model = load_model('model_pkl') # <-------------------- Load the temperature model
+model = joblib.load('sarima_model.sav') # <-------------------- Load the temperature model
 
 def Forecast(model, start, end) : # <--------- Forecast function definition
     '''
