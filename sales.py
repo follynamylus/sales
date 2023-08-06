@@ -44,7 +44,7 @@ def load_model(file_name) : # <---------- Define the function.
     '''
     return sm.iolib.smpickle.load_pickle(file_name) # <------------- Function return
 
-model = joblib.load('sarima_model.sav') # <-------------------- Load the temperature model
+model = joblib.load('sarima_model.pkl') # <-------------------- Load the temperature model
 
 def Forecast(model, start, end) : # <--------- Forecast function definition
     '''
