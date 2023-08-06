@@ -44,7 +44,7 @@ data = df.groupby('Date')['Sales'].sum().reset_index()
 data.set_index('Date', inplace=True)
 data.index = pd.to_datetime(data.index, infer_datetime_format=True)
 data = data['Sales'].resample('MS').mean()
-@st.cache_data
+
 def load_model(file_name) : # <---------- Define the function.
     '''
     The Load model function loads pickled statistical models in the script. 
@@ -55,7 +55,7 @@ def load_model(file_name) : # <---------- Define the function.
 
 model = sm.tsa.statespace.SARIMAX(data,order=(1,1,1),seasonal_order=(1,1,0,12),enforce_invertibility=False)
 results = model.fit() # <-------------------- Load the temperature model
-@st.cache_resource
+
 def Forecast(results, start, end) : # <--------- Forecast function definition
     '''
     The Forecast function performs the tasks of making forecast/prediction.
