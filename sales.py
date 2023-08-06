@@ -35,7 +35,14 @@ else : # <------------------- Condition if not a multiple prediction
     end_date = date # <----------------- End date for a single prediction
 
 # ************************************************ BACKEND CODES ******************************************
-
+df = pd.read_csv("Sales_data.csv")
+df['Sales'] = df['Sales'].shift(7)
+df.dropna(inplace=True)
+df = df.sort_values('Date')
+data = df.groupby('Date')['Sales'].sum().reset_index()
+data.set_index('Date', inplace=True)
+data.index = pd.to_datetime(data.index, infer_datetime_format=True)
+data = data['Sales'].resample('MS').mean()
 def load_model(file_name) : # <---------- Define the function.
     '''
     The Load model function loads pickled statistical models in the script. 
@@ -44,9 +51,10 @@ def load_model(file_name) : # <---------- Define the function.
     '''
     return sm.iolib.smpickle.load_pickle(file_name) # <------------- Function return
 
-model = joblib.load('sarima_model.pkl') # <-------------------- Load the temperature model
+model = sm.tsa.statespace.SARIMAX(data,order=(1,1,1),seasonal_order=(1,1,0,12),enforce_invertibility=False)
+results = model.fit() # <-------------------- Load the temperature model
 
-def Forecast(model, start, end) : # <--------- Forecast function definition
+def Forecast(results, start, end) : # <--------- Forecast function definition
     '''
     The Forecast function performs the tasks of making forecast/prediction.
     It create a dataframe from the predictions with flexible columns depending on the number of multiple choice with date as the index column.
@@ -54,7 +62,7 @@ def Forecast(model, start, end) : # <--------- Forecast function definition
     It returns a dataframe
     '''
     df = pd.DataFrame() # <------------ Create an empty dataframe
-    pred = model.get_prediction(start = pd.to_datetime(start), end = pd.to_datetime(end)) # Make prediction
+    pred = results.get_prediction(start = pd.to_datetime(start), end = pd.to_datetime(end)) # Make prediction
     mean_disp = pred.predicted_mean # <---------- Create series from predicted values
     mean_df = mean_disp.to_frame() # <----------- Convert series to data frame
     mean_df.reset_index(inplace = True) # <------- Reset the data frame's index
@@ -109,14 +117,14 @@ def Single_pred(dataframe) : # <---------------- Function definition
 
 with tab_1 : # <------------------------- Declare tab 1 container
     if pred_type == 'single' : # <-------------- code to check for single prediction
-        df = Forecast(model, start_date, end_date) # <---------------- Call Forecast function in tab 1. 
+        df = Forecast(results, start_date, end_date) # <---------------- Call Forecast function in tab 1. 
         Single_pred(df) # <---------------------- Call to display single prediction values
     else : # <-------------------- Code if not single prediction
          if start_date > end_date : # <-------------- Condition if start date is greater than the end date
-            df = Forecast(model, end_date, start_date) # <---------------- Call Forecast function
+            df = Forecast(results, end_date, start_date) # <---------------- Call Forecast function
             Plots(df) # <------------- Call for plots
          else :
-            df = Forecast(model, start_date, end_date) # <---------------- Call Forecast function
+            df = Forecast(results, start_date, end_date) # <---------------- Call Forecast function
             Plots(df) # <------------- Call for plots
 
 tab_2.dataframe(df) # <--------------- Display the dataframe on tab2
