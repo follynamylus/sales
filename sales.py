@@ -13,18 +13,22 @@ tab_2.title("SALES VISUALIZATION") #<------ Title for First Tab
 tab_1.title("SALES PREDICTION") #<--------- Title for Second Tab
 tab_3.title("ABOUT APPLICATION") #<--------------------Title for Third Tab
 
+st.sidebar.title("Input Widgets")
 pred_type = st.sidebar.selectbox("Select for prediction type, Either Single or Multiple",('single','multiple'))# Widget for prediction type
 if pred_type == 'multiple' : # <------------------ Condition for multiple predictions
     start = st.sidebar.date_input("Input the date from 2023 as start date") #<---------- Input Widget for the start date
     start_date = pd.to_datetime(start) # <-------------------------------------- Convert Start date to a date time format
     end = st.sidebar.date_input("Input the end date later than the start date") #<---------- Input widget for the end date
-    if end == start_date : # <---------------------- Conditional Statement to check if the end date is equal to start date
+    end_date = pd.to_datetime(end) # <------------------- End date for backward prediction
+    if end_date == start_date : # <---------------------- Conditional Statement to check if the end date is equal to start date
+        st.sidebar.success("Select with prediction steps below if preferred")
         option = st.sidebar.selectbox("Tick how you want to forecast", ('forward','backward')) # Code to select prediction option.
         if option == 'forward' : # <---------------- Condition for forward prediction.
             steps = int(st.sidebar.number_input("Input The days to extend to", 0)) # <----- Number of days to predict forward
             end_date = start_date + pd.DateOffset(days = steps) # <----- Set end date for forward prediction
         elif option == 'backward' : # <-------------- Condition for backward prediction
             steps = int(st.sidebar.number_input("Input The days to extend from, not later than 2000 days", 0)) # Days to predict backward
+            st.sidebar.write("backward steps must not be later than 01 - 01 - 2023")
             start_date = start_date - pd.DateOffset(days = steps) # Start date for backward prediction
             end_date = pd.to_datetime(end) # <------------------- End date for backward prediction
     else : # <------------------------- If end and start date are not the same
