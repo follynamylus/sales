@@ -37,8 +37,6 @@ else : # <------------------- Condition if not a multiple prediction
 # ************************************************ BACKEND CODES ******************************************
 
 df = pd.read_csv("Sales_data.csv")
-df['Sales'] = df['Sales'].shift(7)
-df.dropna(inplace=True)
 df = df.sort_values('Date')
 data = df.groupby('Date')['Sales'].sum().reset_index()
 data.set_index('Date', inplace=True)
